@@ -185,7 +185,11 @@ params = {
         'RANDOM_SEED': None,
 
         # Reverse Mapping to GE individual:
-        'REVERSE_MAPPING_TARGET': None
+        'REVERSE_MAPPING_TARGET': None,
+
+        # Maximum SGE Recursion Level
+        'SGE_MAX_REC_LEVEL': 3,
+        'USE_SGE': True
 }
 
 

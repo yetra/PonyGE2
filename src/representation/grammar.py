@@ -1,6 +1,8 @@
 from math import floor
 from re import match, finditer, DOTALL, MULTILINE
 from sys import maxsize
+from copy import deepcopy
+from itertools import product
 
 from algorithm.parameters import params
 
@@ -46,6 +48,10 @@ class Grammar(object):
         # Read in BNF grammar, set production rules, terminals and
         # non-terminals.
         self.read_bnf_file(file_name)
+
+        if params['USE_SGE']:
+            self.rewrite_recursive_rules()
+            self.check_genome_mapping_and_length()
 
         # Check the minimum depths of all non-terminals in the grammar.
         self.check_depths()
@@ -238,6 +244,94 @@ class Grammar(object):
                     # Conflicting rules with the same name.
                     raise ValueError("lhs should be unique",
                                      rule.group('rulename'))
+
+    def rewrite_recursive_rules(self):
+        keys = list(self.rules.keys())
+        for rule in keys:
+            recursive_choices = [c for c in self.rules[rule]['choices'] if any([rule == x['symbol'] for x in c['choice']])]
+            if len(recursive_choices) == 0:
+                continue
+            rule_level = [rule]
+            for i in range(0, params['SGE_MAX_REC_LEVEL']):
+                new_rulename = rule + "_level" + str(i)
+                self.non_terminals[new_rulename] = {
+                    'id': new_rulename,
+                    'min_steps': maxsize,
+                    'expanded': False,
+                    'recursive': True,
+                    'b_factor': 0}
+                self.rules[new_rulename] = deepcopy(self.rules[rule])
+                rule_level.append(new_rulename)
+
+            for i in range(0, len(rule_level)):
+                cur_level = rule_level[i]
+                next_level = rule_level[i + 1] if i < len(rule_level) - 1 else None
+                if next_level:
+                    for choices in self.rules[cur_level]['choices']:
+                        for choice in choices['choice']:
+                            if choice['symbol'] == rule:
+                                choice['symbol'] = next_level
+                else:
+                    non_recursive_choices = [c for c in self.rules[cur_level]['choices'] if not any([rule == x['symbol'] for x in c['choice']])]
+                    new_choices = []
+                    for choices in self.rules[cur_level]['choices']:
+                        number_of_recursive_symbols = sum([rule == x['symbol'] for x in choices['choice']])
+                        if number_of_recursive_symbols == 0:
+                            continue
+
+                        p = list(product(non_recursive_choices, repeat=number_of_recursive_symbols))
+                        for t in p:
+                            new_choice = []
+                            pos = 0
+                            for x in choices['choice']:
+                                if rule == x['symbol']:
+                                    new_choice = new_choice + t[pos]['choice']
+                                    pos += 1
+                                else:
+                                    new_choice.append(x)
+                            new_choices.append({"choice": new_choice,
+                                                "recursive": False,
+                                                "NT_kids": False})
+                    new_choices += non_recursive_choices
+                    self.rules[cur_level]['choices'] = new_choices
+                    self.rules[cur_level]['no_choices'] = len(new_choices)
+
+
+    def check_genome_mapping_and_length(self):
+        genome_length = 1
+        genome_mapping = []
+
+        # calculate genome length per non terminal
+        nt_sym = list(self.non_terminals)
+        nt_sym_genomes = {}
+
+        while nt_sym:
+            keys = nt_sym_genomes.keys()
+            cur_rule = None
+            for rule in nt_sym:
+                if all([all([choice['type'] == "T" or choice['symbol'] in keys for choice in choices['choice']]) for choices in self.rules[rule]['choices']]):
+                    cur_rule = rule
+                    break
+            if not cur_rule:
+                print("Something is wrong")
+                quit()
+            count = 1
+            for choices in self.rules[cur_rule]['choices']:
+                for choice in choices['choice']:
+                    count += 0 if choice['type'] == "T" else nt_sym_genomes[choice['symbol']]
+            nt_sym_genomes[cur_rule] = count
+            del nt_sym[nt_sym.index(cur_rule)]
+
+        # add mapping
+        cur_rule = self.start_rule
+
+        #while
+
+        print('bla')
+
+
+
+
 
     def check_depths(self):
         """
