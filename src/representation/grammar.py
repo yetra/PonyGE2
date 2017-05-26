@@ -298,9 +298,6 @@ class Grammar(object):
 
 
     def check_genome_mapping_and_length(self):
-        genome_length = 1
-        genome_mapping = []
-
         # calculate genome length per non terminal
         nt_sym = list(self.non_terminals)
         nt_sym_genomes = {}
@@ -323,14 +320,23 @@ class Grammar(object):
             del nt_sym[nt_sym.index(cur_rule)]
 
         # add mapping
-        cur_rule = self.start_rule
-
-        #while
-
-        print('bla')
-
-
-
+        genome_mapping = []
+        cur_pos = 0
+        sym_stack = [self.start_rule]
+        while sym_stack:
+            cur_rule = sym_stack.pop(0)
+            choice_pos = []
+            choice_length = 1
+            for choices in self.rules[cur_rule]['choices']:
+                choice_pos.append(cur_pos + 1)
+                for choice in choices['choice']:
+                    if choice['type'] != "T":
+                        choice_length += nt_sym_genomes[choice['symbol']]
+                        sym_stack.insert(0, choice['symbol'])
+                #choice_length += sum([0 if choice['type'] == "T" else nt_sym_genomes[choice['symbol']] for choice in choices['choice']])
+                cur_pos += choice_length
+            genome_mapping.append(choice_pos)
+        genome_length = nt_sym_genomes[self.start_rule]
 
 
     def check_depths(self):
