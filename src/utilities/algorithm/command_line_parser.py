@@ -445,6 +445,7 @@ def parse_cmd_args(arguments):
 
     parser.add_argument('--use_slag',
                         dest='USE_SLAG',
+                        default=None,
                         action='store_true',
                         help='Specifies if Strong Locality Adapted Grammars '
                              '(SLAG) is used. SLAG is a variant of Structured '
