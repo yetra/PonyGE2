@@ -1,6 +1,5 @@
 import numpy as np
 
-from algorithm.mapper import mapper
 from algorithm.parameters import params
 
 
@@ -25,7 +24,8 @@ class Individual(object):
             # The individual needs to be mapped from the given input
             # parameters.
             self.phenotype, self.genome, self.tree, self.nodes, self.invalid, \
-                self.depth, self.used_codons = mapper(genome, ind_tree)
+            self.depth, self.used_codons = params['MAPPER'].mapper(genome,
+                                                                   ind_tree)
 
         else:
             # The individual does not need to be mapped.

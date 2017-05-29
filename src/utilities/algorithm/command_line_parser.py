@@ -61,7 +61,6 @@ def parse_cmd_args(arguments):
 
     parser._optionals.title = 'PonyGE2 command-line usage'
 
-    
     class ListAction(argparse.Action):
         """
         Class for parsing a given string into a list.
@@ -443,6 +442,15 @@ def parse_cmd_args(arguments):
                              'You must specify the full file path to the '
                              'desired state file. Note that state files have '
                              'no file type.')
+
+    parser.add_argument('--use_sge',
+                        dest='USE_SGE',
+                        action='store_true',
+                        help='Specifies if structured GE is used.')
+    parser.add_argument('--sge_max_rec_level',
+                        dest='SGE_MAX_REC_LEVEL',
+                        type=int,
+                        help='Specifies the maximum recursion level for SGE.')
 
     # CACHING
     class CachingAction(argparse.Action):

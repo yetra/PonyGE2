@@ -187,9 +187,10 @@ params = {
         # Reverse Mapping to GE individual:
         'REVERSE_MAPPING_TARGET': None,
 
+        # Use SGE
+        'USE_SGE': False,
         # Maximum SGE Recursion Level
-        'SGE_MAX_REC_LEVEL': 3,
-        'USE_SGE': True
+        'SGE_MAX_REC_LEVEL': 3
 }
 
 
@@ -320,6 +321,13 @@ def set_params(command_line_args, create_files=True):
             params['GENOME_OPERATIONS'] = True
         else:
             params['GENOME_OPERATIONS'] = False
+
+        if not params['USE_SGE']:
+            from algorithm.mapper import Mapper
+            params['MAPPER'] = Mapper()
+        else:
+            from algorithm.sge_mapper import SGEMapper
+            params['MAPPER'] = SGEMapper()
 
         # Parse grammar file and set grammar class.
         params['BNF_GRAMMAR'] = grammar.Grammar(path.join("..", "grammars",

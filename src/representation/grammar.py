@@ -1,8 +1,9 @@
+from collections import deque
+from copy import deepcopy
+from itertools import product
 from math import floor
 from re import match, finditer, DOTALL, MULTILINE
 from sys import maxsize
-from copy import deepcopy
-from itertools import product
 
 from algorithm.parameters import params
 
@@ -164,7 +165,7 @@ class Grammar(object):
                                 self.terminals[str(i)] = \
                                     [rule.group('rulename')]
                             elif rule.group('rulename') not in \
-                                self.terminals[str(i)]:
+                                    self.terminals[str(i)]:
                                 self.terminals[str(i)].append(
                                     rule.group('rulename'))
                             tmp_productions.append({"choice": tmp_production,
@@ -192,7 +193,7 @@ class Grammar(object):
                                     self.terminals[terminalparts] = \
                                         [rule.group('rulename')]
                                 elif rule.group('rulename') not in \
-                                    self.terminals[terminalparts]:
+                                        self.terminals[terminalparts]:
                                     self.terminals[terminalparts].append(
                                         rule.group('rulename'))
                                 terminalparts = None
@@ -221,7 +222,7 @@ class Grammar(object):
                             self.terminals[terminalparts] = \
                                 [rule.group('rulename')]
                         elif rule.group('rulename') not in \
-                            self.terminals[terminalparts]:
+                                self.terminals[terminalparts]:
                             self.terminals[terminalparts].append(
                                 rule.group('rulename'))
                     tmp_productions.append({"choice": tmp_production,
@@ -248,12 +249,13 @@ class Grammar(object):
     def rewrite_recursive_rules(self):
         keys = list(self.rules.keys())
         for rule in keys:
-            recursive_choices = [c for c in self.rules[rule]['choices'] if any([rule == x['symbol'] for x in c['choice']])]
+            recursive_choices = [c for c in self.rules[rule]['choices'] if any(
+                [rule == x['symbol'] for x in c['choice']])]
             if len(recursive_choices) == 0:
                 continue
             rule_level = [rule]
             for i in range(0, params['SGE_MAX_REC_LEVEL']):
-                new_rulename = rule + "_level" + str(i)
+                new_rulename = rule[:-1] + "_level" + str(i) + ">"
                 self.non_terminals[new_rulename] = {
                     'id': new_rulename,
                     'min_steps': maxsize,
@@ -265,21 +267,27 @@ class Grammar(object):
 
             for i in range(0, len(rule_level)):
                 cur_level = rule_level[i]
-                next_level = rule_level[i + 1] if i < len(rule_level) - 1 else None
+                next_level = rule_level[i + 1] if i < len(
+                    rule_level) - 1 else None
                 if next_level:
                     for choices in self.rules[cur_level]['choices']:
                         for choice in choices['choice']:
                             if choice['symbol'] == rule:
                                 choice['symbol'] = next_level
                 else:
-                    non_recursive_choices = [c for c in self.rules[cur_level]['choices'] if not any([rule == x['symbol'] for x in c['choice']])]
+                    non_recursive_choices = [c for c in
+                                             self.rules[cur_level]['choices']
+                                             if not any(
+                            [rule == x['symbol'] for x in c['choice']])]
                     new_choices = []
                     for choices in self.rules[cur_level]['choices']:
-                        number_of_recursive_symbols = sum([rule == x['symbol'] for x in choices['choice']])
+                        number_of_recursive_symbols = sum(
+                            [rule == x['symbol'] for x in choices['choice']])
                         if number_of_recursive_symbols == 0:
                             continue
 
-                        p = list(product(non_recursive_choices, repeat=number_of_recursive_symbols))
+                        p = list(product(non_recursive_choices,
+                                         repeat=number_of_recursive_symbols))
                         for t in p:
                             new_choice = []
                             pos = 0
@@ -296,7 +304,6 @@ class Grammar(object):
                     self.rules[cur_level]['choices'] = new_choices
                     self.rules[cur_level]['no_choices'] = len(new_choices)
 
-
     def check_genome_mapping_and_length(self):
         # calculate genome length per non terminal
         nt_sym = list(self.non_terminals)
@@ -306,7 +313,10 @@ class Grammar(object):
             keys = nt_sym_genomes.keys()
             cur_rule = None
             for rule in nt_sym:
-                if all([all([choice['type'] == "T" or choice['symbol'] in keys for choice in choices['choice']]) for choices in self.rules[rule]['choices']]):
+                if all([all(
+                        [choice['type'] == "T" or choice['symbol'] in keys for
+                         choice in choices['choice']]) for choices in
+                        self.rules[rule]['choices']]):
                     cur_rule = rule
                     break
             if not cur_rule:
@@ -315,29 +325,35 @@ class Grammar(object):
             count = 1
             for choices in self.rules[cur_rule]['choices']:
                 for choice in choices['choice']:
-                    count += 0 if choice['type'] == "T" else nt_sym_genomes[choice['symbol']]
+                    count += 0 if choice['type'] == "T" else nt_sym_genomes[
+                        choice['symbol']]
             nt_sym_genomes[cur_rule] = count
             del nt_sym[nt_sym.index(cur_rule)]
 
         # add mapping
         genome_mapping = []
-        cur_pos = 0
-        sym_stack = [self.start_rule]
+        count = 0
+        sym_stack = deque([self.start_rule['symbol']])
         while sym_stack:
-            cur_rule = sym_stack.pop(0)
+            cur_rule = sym_stack.popleft()
+            next_sumbols = []
             choice_pos = []
-            choice_length = 1
+            cur_pos = count
             for choices in self.rules[cur_rule]['choices']:
-                choice_pos.append(cur_pos + 1)
+                cur_choice_pos = []
                 for choice in choices['choice']:
                     if choice['type'] != "T":
-                        choice_length += nt_sym_genomes[choice['symbol']]
-                        sym_stack.insert(0, choice['symbol'])
-                #choice_length += sum([0 if choice['type'] == "T" else nt_sym_genomes[choice['symbol']] for choice in choices['choice']])
-                cur_pos += choice_length
+                        cur_choice_pos.append(cur_pos + 1)
+                        cur_pos += nt_sym_genomes[choice['symbol']]
+                        next_sumbols.append(choice['symbol'])
+                choice_pos.append(cur_choice_pos)
             genome_mapping.append(choice_pos)
-        genome_length = nt_sym_genomes[self.start_rule]
-
+            sym_stack.extendleft(reversed(next_sumbols))
+            count += 1
+        params['INIT_GENOME_LENGTH'] = nt_sym_genomes[
+            self.start_rule['symbol']]
+        params['MAX_GENOME_LENGTH'] = params['INIT_GENOME_LENGTH']
+        params['MAPPER'].set_genome_mapping(genome_mapping)
 
     def check_depths(self):
         """
@@ -371,7 +387,7 @@ class Grammar(object):
                 # Find edges which either connect to terminals or nodes
                 # which are fully expanded.
                 if all([sy["type"] == "T" or
-                        self.non_terminals[sy["symbol"]]['expanded']
+                                self.non_terminals[sy["symbol"]]['expanded']
                         for sy in edge[1]]):
                     removeset.add(edge[0])
 
@@ -483,7 +499,7 @@ class Grammar(object):
             for choice in choices:
                 # Set the maximum path to a terminal for each produciton choice
                 choice['max_path'] = max([item["min_steps"] for item in
-                                      choice['choice']])
+                                          choice['choice']])
 
             # Find shortest path to a terminal for all production choices for
             # the current NT. The shortest path will be the minimum of the
@@ -598,7 +614,8 @@ class Grammar(object):
                                 # each NT symbol in the original choice.
 
                                 if len(child['choice']) == 1 and \
-                                   child['choice'][0]["type"] == "T":
+                                                child['choice'][0][
+                                                    "type"] == "T":
                                     # If the child choice leads directly to
                                     # a single terminal, increment the
                                     # permutation count.
@@ -610,9 +627,12 @@ class Grammar(object):
                                     # Generate a key for the permutations
                                     # dictionary and increment the
                                     # permutations count there.
-                                    key = [sym['symbol'] for sym in child['choice']]
-                                    if (i - 1) in depth_per_symbol_trees[str(key)].keys():
-                                        symbol_arity_pos += depth_per_symbol_trees[str(key)][i - 1]
+                                    key = [sym['symbol'] for sym in
+                                           child['choice']]
+                                    if (i - 1) in depth_per_symbol_trees[
+                                        str(key)].keys():
+                                        symbol_arity_pos += \
+                                        depth_per_symbol_trees[str(key)][i - 1]
 
                             # Multiply original count by new count.
                             sym_pos *= symbol_arity_pos
@@ -626,7 +646,9 @@ class Grammar(object):
             for sy in start_symbols:
                 key = [sym['symbol'] for sym in sy['choice']]
                 if str(key) in depth_per_symbol_trees:
-                    pos += depth_per_symbol_trees[str(key)][depth] if depth in depth_per_symbol_trees[str(key)] else 0
+                    pos += depth_per_symbol_trees[str(key)][depth] \
+                           if depth in depth_per_symbol_trees[str(key)] \
+                           else 0
                 else:
                     pos += 1
 
