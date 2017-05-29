@@ -1,11 +1,5 @@
-<start> ::= <expr>
-<expr>  ::= <expr>+<expr>|
-            <expr>-<expr>|
-            <expr>*<expr>|
-            pdiv(<expr>,<expr>)|
-            np.sin(<expr>)|
-            np.cos(<expr>)|
-            np.exp(<expr>)|
-            plog(<expr>)|
-            x[0]|
-            1.0
+<start>::= <expr>
+<expr>::= <expr><op><expr>|(<expr>)|<pre_op>(<expr>)|<var>
+<op>::= +|-|*|/
+<pre_op>::= np.sin|np.cos|np.exp|plog
+<var>::=x[0]|1.0
