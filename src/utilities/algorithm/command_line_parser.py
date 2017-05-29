@@ -443,10 +443,12 @@ def parse_cmd_args(arguments):
                              'desired state file. Note that state files have '
                              'no file type.')
 
-    parser.add_argument('--use_sge',
-                        dest='USE_SGE',
+    parser.add_argument('--use_slag',
+                        dest='USE_SLAG',
                         action='store_true',
-                        help='Specifies if structured GE is used.')
+                        help='Specifies if Strong Locality Adapted Grammars '
+                             '(SLAG) is used. SLAG is a variant of Structured '
+                             'GE.')
     parser.add_argument('--sge_max_rec_level',
                         dest='SGE_MAX_REC_LEVEL',
                         type=int,

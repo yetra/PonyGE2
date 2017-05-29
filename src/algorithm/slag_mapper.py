@@ -4,7 +4,7 @@ from algorithm.parameters import params
 from utilities.representation.python_filter import python_filter
 
 
-class SGEMapper:
+class SLAGMapper:
     def __init__(self):
         self.genome_mapping = None
 
@@ -80,17 +80,15 @@ class SGEMapper:
                 positions.extendleft(reversed(
                     self.genome_mapping[current_pos][current_production]))
 
-                if len([s for s in unexpanded_symbols if
-                        s[0]['type'] == 'NT']) != len(positions):
-                    print('asdf')
+                assert len([s for s in unexpanded_symbols if
+                            s[0]['type'] == 'NT']) == len(positions)
 
                 if nt_count > 0:
                     nodes += nt_count
                 else:
                     nodes += 1
 
-        if len(unexpanded_symbols) != 0 or len(positions) != 0:
-            print('asdf')
+        assert len(unexpanded_symbols) == 0 and len(positions) == 0
 
         # Generate phenotype string.
         output = "".join(output)

@@ -50,7 +50,7 @@ class Grammar(object):
         # non-terminals.
         self.read_bnf_file(file_name)
 
-        if params['USE_SGE']:
+        if params['USE_SLAG']:
             self.rewrite_recursive_rules()
             self.check_genome_mapping_and_length()
 
