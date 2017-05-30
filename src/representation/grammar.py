@@ -38,7 +38,7 @@ class Grammar(object):
 
         # Initialise dicts for terminals and non terminals, set params.
         self.non_terminals, self.terminals = {}, {}
-        self.start_rule = None
+        self.start_rule, self.codon_size = None, params['CODON_SIZE']
         self.min_path, self.max_arity, self.min_ramp = None, None, None
 
         # Set regular expressions for parsing BNF grammar.
@@ -613,11 +613,9 @@ class Grammar(object):
                                 # Iterate over all production choices for
                                 # each NT symbol in the original choice.
 
-                                if len(child['choice']) == 1 and \
-                                                child['choice'][0][
-                                                    "type"] == "T":
-                                    # If the child choice leads directly to
-                                    # a single terminal, increment the
+                                if all(c['type'] == 'T' for c in child['choice']):
+                                    # If the child choice leads only to
+                                    # terminal symbols, increment the
                                     # permutation count.
                                     symbol_arity_pos += 1
 
