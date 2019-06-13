@@ -1,0 +1,5 @@
+# https://www.mitpressjournals.org/doi/pdf/10.1162/978-0-262-31709-2-ch137
+
+<expr> ::= <line> | <expr>{::}<line>
+<line> ::= if ant.food_ahead():{:<expr>:}else:{:<expr>:} | <op>
+<op> ::= ant.turn_left() | ant.turn_right() | ant.move()
