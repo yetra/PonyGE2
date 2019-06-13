@@ -2,11 +2,12 @@ from santa_fe.Ant import Ant
 from santa_fe.Trail import Trail
 
 
+
 def main():
     """
     Displays the results of an evolved Santa Fe Trail solution on a specified trail.
     """
-    trail = Grid('/Users/boftherebellion/Desktop/seminar/PonyGE2/datasets/AntTrails/santa_fe_trail.txt')
+    trail = Grid('/Users/boftherebellion/PycharmProjects/PonyGE2/datasets/AntTrails/santa_fe_trail.txt')
 
     print(str(trail))
 

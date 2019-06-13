@@ -25,7 +25,7 @@ class santa_fe_trail(base_ff):
         """
         phenotype = ind.phenotype
 
-        trail = Trail('/Users/boftherebellion/Desktop/seminar/PonyGE2/datasets/AntTrails/santa_fe_trail.txt')
+        trail = Trail('/Users/boftherebellion/PycharmProjects/PonyGE2/datasets/AntTrails/santa_fe_trail.txt')
         d = {'ant': Ant(trail, 630)}
 
         while not d['ant'].finished():
