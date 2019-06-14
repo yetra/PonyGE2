@@ -6,7 +6,7 @@ class Grid:
     Models a trail of food pellets laid out on a 32 x 32 rectangular grid.
     """
 
-    DIMENSION = 32
+    dimension = 32
 
     def __init__(self, file_name):
         """
@@ -20,8 +20,8 @@ class Grid:
         self.food_pieces = 0
         self.grid = []
 
-        for y in range(self.DIMENSION):
-            for x in range(self.DIMENSION):
+        for y in range(Grid.dimension):
+            for x in range(Grid.dimension):
                 value = int(lines[y][x])
                 self.grid.append(Cell(y, x, value))
 
@@ -56,8 +56,8 @@ class Grid:
         """
         grid_string = ""
 
-        for y in range(self.DIMENSION):
-            for x in range(self.DIMENSION):
+        for y in range(Grid.dimension):
+            for x in range(Grid.dimension):
                 cell = self.grid[y + 32 * x]
 
                 if self.has_food_on(cell):

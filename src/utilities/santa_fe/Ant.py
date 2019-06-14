@@ -1,5 +1,6 @@
 from utilities.santa_fe.Cell import Cell
 from utilities.santa_fe.Direction import Direction
+from utilities.santa_fe.Grid import Grid
 
 
 class Ant:
@@ -10,9 +11,9 @@ class Ant:
     methods - move, turn_left, turn_right - and consumes the food it finds on its path.
     """
 
-    DEFAULT_ENERGY = 600
+    default_energy = 600
 
-    def __init__(self, grid, total_energy=DEFAULT_ENERGY):
+    def __init__(self, grid, total_energy=default_energy):
         """
         Creates a new ant of a specified total energy to traverse a given trail.
 
@@ -118,22 +119,22 @@ class Ant:
         if self.direction == Direction.NORTH:
             y -= 1
             if y < 0:
-                y = self.grid.DIMENSION - 1
+                y = Grid.dimension - 1
 
         elif self.direction == Direction.SOUTH:
             y += 1
-            if y > self.grid.DIMENSION - 1:
+            if y > Grid.dimension - 1:
                 y = 0
 
         elif self.direction == Direction.EAST:
             x += 1
-            if x > self.grid.DIMENSION - 1:
+            if x > Grid.dimension - 1:
                 x = 0
 
         else:
             x -= 1
             if x < 0:
-                x = self.grid.DIMENSION - 1
+                x = Grid.dimension - 1
 
         return Cell(x, y)
 
@@ -160,8 +161,8 @@ class Ant:
         ant_string += "Food eaten: {}\n".format(self.food_eaten)
         ant_string += "Path taken:\n"
 
-        for y in range(self.grid.DIMENSION):
-            for x in range(self.grid.DIMENSION):
+        for y in range(Grid.dimension):
+            for x in range(Grid.dimension):
 
                 if Cell(x, y) in self.ant_path:
                     ant_string += "A"
