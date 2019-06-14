@@ -1,5 +1,5 @@
-from santa_fe.Direction import Direction
-from santa_fe.Cell import Cell
+from utilities.santa_fe.Cell import Cell
+from utilities.santa_fe.Direction import Direction
 
 
 class Ant:

@@ -1,3 +1,5 @@
+
+
 class Cell:
     """
     Models a cell in the trail grid.

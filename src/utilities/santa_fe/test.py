@@ -1,6 +1,5 @@
-from santa_fe.Ant import Ant
-from santa_fe.Trail import Trail
-
+from utilities.santa_fe.Ant import Ant
+from utilities.santa_fe.Grid import Grid
 
 
 def main():

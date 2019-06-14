@@ -1,4 +1,4 @@
-from santa_fe.Cell import Cell
+from utilities.santa_fe.Cell import Cell
 
 
 class Grid:

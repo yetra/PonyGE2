@@ -1,7 +1,7 @@
 from fitness.base_ff_classes.base_ff import base_ff
 
-from santa_fe.Ant import Ant
-from santa_fe.Trail import Trail
+from utilities.santa_fe.Ant import Ant
+from utilities.santa_fe.Grid import Grid
 
 
 class santa_fe_trail(base_ff):
@@ -25,7 +25,7 @@ class santa_fe_trail(base_ff):
         """
         phenotype = ind.phenotype
 
-        trail = Trail('/Users/boftherebellion/PycharmProjects/PonyGE2/datasets/AntTrails/santa_fe_trail.txt')
+        trail = Grid('/Users/boftherebellion/PycharmProjects/PonyGE2/datasets/AntTrails/santa_fe_trail.txt')
         d = {'ant': Ant(trail, 630)}
 
         while not d['ant'].finished():
