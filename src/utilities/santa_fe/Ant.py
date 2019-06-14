@@ -157,9 +157,8 @@ class Ant:
 
         :return: a string representation of this ant
         """
-        ant_string = "Energy consumed: {}\n".format(self.energy_consumed)
-        ant_string += "Food eaten: {}\n".format(self.food_eaten)
-        ant_string += "Path taken:\n"
+        ant_string = "Food eaten: {}\n".format(self.food_eaten)
+        ant_string += "Energy consumed: {}\n".format(self.energy_consumed)
 
         for y in range(Grid.dimension):
             for x in range(Grid.dimension):

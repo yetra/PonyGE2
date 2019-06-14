@@ -13,6 +13,7 @@ def main():
     """
     trail = Grid(file_path)
 
+    # original trail
     print(str(trail))
 
     d = {'ant': Ant(trail, 600)}
@@ -35,7 +36,12 @@ else:
     ant.move()
 ''', d)
 
+    # uneaten food left on the trail
+    uneaten_food = trail.food_pieces - d['ant'].food_eaten
+    print("Uneaten food: {}".format(uneaten_food))
     print(str(trail))
+
+    # path taken by the ant
     print(str(d['ant']))
 
 
