@@ -1,12 +1,17 @@
 from utilities.santa_fe.Ant import Ant
 from utilities.santa_fe.Grid import Grid
 
+from pathlib import Path
+
+base_path = Path(__file__).parents[3]
+file_path = (base_path / "datasets/AntTrails/santa_fe_trail.txt").resolve()
+
 
 def main():
     """
     Displays the results of an evolved Santa Fe Trail solution on a specified trail.
     """
-    trail = Grid('/Users/boftherebellion/PycharmProjects/PonyGE2/datasets/AntTrails/santa_fe_trail.txt')
+    trail = Grid(file_path)
 
     print(str(trail))
 
